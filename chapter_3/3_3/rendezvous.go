@@ -13,9 +13,9 @@ func threadA(x, y chan bool) {
 	defer wg.Done()
 
 	fmt.Println("A1")
-	x <- true
+	x <- true // signal A1 is done
 
-	<-y
+	<-y // wait for B1
 	fmt.Println("A2")
 }
 
@@ -23,9 +23,9 @@ func threadB(x, y chan bool) {
 	defer wg.Done()
 
 	fmt.Println("B1")
-	y <- true
+	y <- true // signal B1 is done
 
-	<-x
+	<-x // wait for A1
 	fmt.Println("B2")
 }
 
