@@ -7,36 +7,37 @@ import (
 
 var wg = sync.WaitGroup{} // global wait group
 
-func threadA(data *int, mutex chan bool) {
+func threadA(mutex chan int) {
 	defer wg.Done()
 	for i := 0; i < 100; i++ {
-		<-mutex
-		*data++
+		count := <-mutex
 
-		fmt.Println("threadA updated Count to: ", *data)
-		mutex <- true
+		count++
+
+		fmt.Println("threadA updated Count to: ", count)
+		mutex <- count
 	}
 }
 
-func threadB(data *int, mutex chan bool) {
+func threadB(mutex chan int) {
 	defer wg.Done()
 	for i := 0; i < 100; i++ {
-		<-mutex
-		*data++
+		count := <-mutex
 
-		fmt.Println("threadB updated Count to: ", *data)
-		mutex <- true
+		count++
+
+		fmt.Println("threadB updated Count to: ", count)
+		mutex <- count
 	}
 }
 
 func main() {
-	count := 0
-	mu := make(chan bool, 1)
-	mu <- true
+	mu := make(chan int, 1)
+	mu <- 0
 	wg.Add(2)
 
-	go threadA(&count, mu) // add 100 to count
-	go threadB(&count, mu)
+	go threadA(mu) // add 100 to count
+	go threadB(mu)
 
 	wg.Wait()
 }
